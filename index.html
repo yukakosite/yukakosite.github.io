@@ -3,209 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>惊喜盒子 🎁</title>
+    <title>专属心动礼物</title>
     <style>
         :root {
-            --primary-color: #ff7eb8;
-            --secondary-color: #fff2f7;
+            --primary-red: #ff4d4d;
+            --glass-bg: rgba(255, 255, 255, 0.9);
         }
 
         body {
-            background: #fff9fc;
-            font-family: 'Microsoft YaHei', cursive;
-            margin: 0;
+            background: linear-gradient(135deg, #fff5fb 0%, #f8f4ff 100%);
             min-height: 100vh;
-            overflow: hidden;
-            position: relative;
+            overflow-x: hidden;
+            margin: 0;
         }
 
-        /* 心形启动按钮 */
-        #heartButton {
-            position: absolute;
-            left: 50%;
+        /* 心形按钮 (60x60px) */
+        #heartContainer {
+            position: fixed;
             top: 50%;
+            left: 50%;
             transform: translate(-50%, -50%);
+            z-index: 1000;
             cursor: pointer;
-            z-index: 999;
-            transition: all 0.5s ease;
-            text-align: center;
+            transition: opacity 0.5s;
         }
-
-        .heart-shape {
-            width: 80px;
-            height: 80px;
-            background: var(--primary-color);
+        .heart-btn {
+            width: 30px;
+            height: 30px;
+            background: var(--primary-red);
             transform: rotate(45deg);
-            margin: 0 auto;
+            animation: heartbeat 1.2s infinite;
             position: relative;
-            box-shadow: 0 0 20px rgba(255, 126, 184, 0.3);
-            animation: pulse 2s infinite;
         }
-
-        .heart-shape:before,
-        .heart-shape:after {
+        .heart-btn::before,
+        .heart-btn::after {
             content: '';
-            width: 80px;
-            height: 80px;
-            background: var(--primary-color);
+            width: 60px;
+            height: 60px;
+            background: var(--primary-red);
             border-radius: 50%;
             position: absolute;
         }
+        .heart-btn::before { top: -30px; }
+        .heart-btn::after { left: -30px; }
 
-        .heart-shape:before {
-            top: -40px;
-            left: 0;
-        }
-
-        .heart-shape:after {
-            left: -40px;
-            top: 0;
-        }
-
-        .button-text {
-            position: absolute;
-            top: 120%;
-            left: 50%;
-            transform: translateX(-50%);
-            color: var(--primary-color);
-            font-size: 1.2em;
-            white-space: nowrap;
-        }
-
-        /* 主内容容器 */
+        /* 主内容 */
         #mainContent {
+            display: none;
             opacity: 0;
-            transform: translateY(20px);
-            transition: all 1s ease;
-            padding: 30px;
-            max-width: 800px;
-            margin: 0 auto;
+            padding: 20px;
         }
 
-        .show-content {
-            opacity: 1 !important;
-            transform: translateY(0) !important;
-        }
-
-        /* 内容区域样式 */
+        /* 磨砂玻璃效果 */
         .content-box {
-            background: rgba(255, 255, 255, 0.95);
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-radius: 15px;
             padding: 30px;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-            margin-top: 30px;
         }
 
-        .photo-section {
+        /* 自动滚动图片区 */
+        .photo-scroll {
+            width: 100%;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+        .scroll-track {
             display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin: 30px 0;
+            animation: scroll 30s linear infinite;
+            width: max-content;
         }
-
-        .photo-frame {
-            width: 200px;
-            height: 200px;
+        .photo-item {
+            width: 300px;
+            height: 400px;
+            margin-right: 20px;
             border-radius: 15px;
             overflow: hidden;
             transition: transform 0.3s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            flex-shrink: 0;
+            background: var(--glass-bg);
+        }
+        .photo-item:hover {
+            transform: scale(1.08);
+            cursor: pointer;
+        }
+        .photo-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        .photo-frame:hover {
-            transform: scale(1.05);
+        /* 动画 */
+        @keyframes heartbeat {
+            0%, 100% { transform: rotate(45deg) scale(1); }
+            70% { transform: rotate(45deg) scale(1.1); }
+        }
+        @keyframes scroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
         }
 
-        @keyframes pulse {
-            0% { transform: rotate(45deg) scale(1); }
-            50% { transform: rotate(45deg) scale(1.1); }
-            100% { transform: rotate(45deg) scale(1); }
+        /* 爱心雨 */
+        .heart-rain {
+            position: fixed;
+            color: var(--primary-red);
+            animation: fall 3s linear infinite;
+            opacity: 0.8;
+            pointer-events: none;
+        }
+        @keyframes fall {
+            0% { transform: translateY(-100vh) translateX(0); }
+            100% { transform: translateY(100vh) translateX(15vw); }
+        }
+
+        /* 点击星星 */
+        .star {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: radial-gradient(circle, #fff 20%, rgba(255,168,214,0.6) 60%, transparent 100%);
+            animation: sparkle 1s ease-out;
+            pointer-events: none;
+        }
+        @keyframes sparkle {
+            0% { transform: scale(0); opacity: 1; }
+            50% { transform: scale(1.5); }
+            100% { transform: scale(0); opacity: 0; }
         }
     </style>
 </head>
 <body>
-    <!-- 心形启动按钮 -->
-    <div id="heartButton">
-        <div class="heart-shape"></div>
-        <div class="button-text">Click Here</div>
+    <!-- 心形按钮 -->
+    <div id="heartContainer">
+        <div class="heart-btn"></div>
     </div>
 
-    <!-- 主内容区域 -->
+    <!-- 主内容 -->
     <div id="mainContent">
         <div class="content-box">
-            <h1>给最特别的你 💌</h1>
-            <p>每一个瞬间都值得被珍藏...</p>
-            
-            <div class="photo-section">
-                <div class="photo-frame">
-                    <img src="/image1.jpg" alt="记忆碎片" style="width:100%;height:100%;object-fit:cover;">
-                </div>
-                <div class="photo-frame">
-                    <img src="/image1.jpg" alt="美好时光" style="width:100%;height:100%;object-fit:cover;">
+            <div class="photo-scroll">
+                <div class="scroll-track">
+                    <div class="photo-item"><img src="image1.jpg"></div>
+                    <div class="photo-item"><img src="image1.jpg"></div>
+                    <div class="photo-item"><img src="image1.jpg"></div>
+                    <div class="photo-item"><img src="image1.jpg"></div>
+                    <div class="photo-item"><img src="image1.jpg"></div>
                 </div>
             </div>
-
-            <div class="love-message">
-                <p>🌙 </p>
-                <p>✨ </p>
-                <p>🌸 </p>
-            </div>
+            <h1>给特别的你</h1>
+            <p>每个瞬间都值得珍藏...</p>
         </div>
     </div>
 
+    <!-- 音频 -->
+    <audio id="bgm" loop>
+        <source src="bgm.mp3" type="audio/mpeg">
+    </audio>
+
     <script>
-        // 心形按钮点击事件
-        const heartButton = document.getElementById('heartButton');
+        // 初始化状态
+        let isPlaying = false;
+        const heartContainer = document.getElementById('heartContainer');
         const mainContent = document.getElementById('mainContent');
+        const scrollTrack = document.querySelector('.scroll-track');
+        const audio = document.getElementById('bgm');
 
-        heartButton.addEventListener('click', () => {
-            // 隐藏按钮
-            heartButton.style.opacity = '0';
-            heartButton.style.pointerEvents = 'none';
-
-            // 显示主内容
+        // 心形按钮点击
+        heartContainer.addEventListener('click', () => {
+            heartContainer.style.opacity = '0';
+            heartContainer.style.pointerEvents = 'none';
+            
+            mainContent.style.display = 'block';
             setTimeout(() => {
-                mainContent.classList.add('show-content');
-            }, 300);
+                mainContent.style.opacity = '1';
+            }, 100);
 
-            // 添加背景特效
+            // 启动功能
             createHearts();
+            audio.play();
+            setupInteractions();
         });
 
-        // 背景爱心特效（可选）
+        // 创建爱心雨
         function createHearts() {
-            const heartEmojis = ['❤️', '💖', '💝', '🌸'];
             setInterval(() => {
-                if(Math.random() > 0.7) {
-                    const heart = document.createElement('div');
-                    heart.style.cssText = `
-                        position: fixed;
-                        font-size: ${Math.random()*20 + 15}px;
-                        opacity: ${Math.random()*0.5 + 0.3};
-                        left: ${Math.random()*100}%;
-                        top: -50px;
-                        animation: float ${Math.random()*5 + 5}s ease-in;
-                        pointer-events: none;
-                    `;
-                    heart.innerHTML = heartEmojis[Math.floor(Math.random()*4)];
-                    document.body.appendChild(heart);
-
-                    setTimeout(() => heart.remove(), 6000);
-                }
-            }, 500);
+                const heart = document.createElement('div');
+                heart.className = 'heart-rain';
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.fontSize = Math.random() * 20 + 15 + 'px';
+                heart.innerHTML = Math.random() > 0.5 ? '❤️' : '💖';
+                document.body.appendChild(heart);
+                setTimeout(() => heart.remove(), 3000);
+            }, 300);
         }
 
-        // 浮动动画
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes float {
-                0% { transform: translateY(0) rotate(0deg); }
-                50% { transform: translateY(-20px) rotate(180deg); }
-                100% { transform: translateY(100vh) rotate(360deg); }
-            }
-        `;
-        document.head.appendChild(style);
+        // 点击星星效果
+        document.addEventListener('click', (e) => {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.style.left = e.clientX + 'px';
+            star.style.top = e.clientY + 'px';
+            document.body.appendChild(star);
+            setTimeout(() => star.remove(), 1000);
+        });
+
+        // 图片交互
+        function setupInteractions() {
+            // 悬停控制
+            document.querySelectorAll('.photo-item').forEach(item => {
+                item.addEventListener('mouseenter', () => {
+                    scrollTrack.style.animationPlayState = 'paused';
+                });
+                item.addEventListener('mouseleave', () => {
+                    scrollTrack.style.animationPlayState = 'running';
+                });
+            });
+
+            // 点击放大
+            document.querySelectorAll('.photo-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    item.classList.toggle('zoomed');
+                });
+            });
+        }
+
+        // 重置滚动位置
+        scrollTrack.addEventListener('animationiteration', () => {
+            scrollTrack.style.animation = 'none';
+            void scrollTrack.offsetWidth;
+            scrollTrack.style.animation = 'scroll 30s linear infinite';
+        });
     </script>
 </body>
 </html>
