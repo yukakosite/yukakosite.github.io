@@ -51,33 +51,45 @@
         .content-container {
             max-width: 800px;
             width: 90%;
-            background-color: rgba(255, 255, 255, 0.9);
-            border-radius: 15px;
+            background-color: white; /* 修改为纯色背景 */
             padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
             opacity: 0;
-            transition: opacity 1s ease, transform 1s ease;
-            transform: translateY(20px);
+            transition: opacity 1s ease;
+            margin-top: 20px;
         }
         
         .content-container.visible {
             opacity: 1;
-            transform: translateY(0);
         }
         
-        /* 文字区域样式 */
+    /* 修改文字区域样式 */
         .text-area {
-            margin: 20px 0;
-            min-height: 100px;
+            margin: 20px auto;
             line-height: 1.6;
             color: #333;
             font-size: 1.1rem;
-            opacity: 0;
-            transition: opacity 1s ease;
+            white-space: nowrap;
+            overflow: visible;
+            position: relative;
+            display: block;
+            width: fit-content;
+            padding-right: 25px;
+            height: 40px;
         }
-        
-        .text-area.visible {
+
+        .text-area::after {
+            content: "|";
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0;
+            transition: opacity 0.1s;
+        }
+
+        .text-area.active::after {
             opacity: 1;
+            animation: blink 0.8s step-end infinite;
         }
         
         /* 图片样式 */
@@ -87,8 +99,10 @@
             height: auto;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            margin: 20px auto;
-            display: block;
+            position: absolute;
+            top: 50px;
+            left: 50%;
+            transform: translateX(-50%);
             opacity: 0;
             transition: opacity 1s ease;
         }
@@ -118,7 +132,7 @@
             animation: fall linear infinite;
         }
         
-        /* 闪烁星星样式 */
+        /* 星星样式 */
         .stars {
             position: fixed;
             top: 0;
@@ -133,7 +147,12 @@
             position: absolute;
             color: white;
             font-size: 10px;
-            animation: twinkle 2s infinite alternate;
+            animation: fade 3s forwards;
+        }
+        
+        @keyframes fade {
+            from { opacity: 1; }
+            to { opacity: 0; }
         }
         
         /* 动画关键帧 */
@@ -149,16 +168,6 @@
                 transform: translateY(calc(100vh + 100px)) rotate(360deg);
                 opacity: 0;
             }
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes twinkle {
-            0% { opacity: 0.2; }
-            100% { opacity: 1; }
         }
         
         /* 响应式设计 */
@@ -179,11 +188,11 @@
         <div class="heart-shape"></div>
     </div>
     
+    <!-- 礼物图片 -->
+    <img src="https://images.unsplash.com/photo-1558981403-cd07ec5b0abd?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="礼物图片" class="gift-image" id="giftImage">
+    
     <!-- 内容容器 -->
     <div class="content-container" id="contentContainer">
-        <!-- 礼物图片 -->
-        <img src="https://images.unsplash.com/photo-1558981403-cd07ec5b0abd?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="礼物图片" class="gift-image" id="giftImage">
-        
         <!-- 文字区域 -->
         <div class="text-area" id="textArea"></div>
     </div>
@@ -191,7 +200,7 @@
     <!-- 爱心雨 -->
     <div class="heart-rain" id="heartRain"></div>
     
-    <!-- 闪烁星星 -->
+    <!-- 星星 -->
     <div class="stars" id="stars"></div>
     
     <!-- 背景音乐 -->
@@ -203,18 +212,24 @@
         // 可调参数
         const config = {
             // 文字内容
-            message: "test",
-            
+            message: [
+                "ttttttttttttttttttttttttttttttttttttttttttt！",
+                "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+                "ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss！"
+            ],
             // 文字区域样式
             textColor: "#333", // 文字颜色
             textSize: "1.1rem", // 文字大小
-            textLineHeight: "1.6", // 文字行高
+            textLineHeight: "1.2", // 文字行高
+            
+            // 打字机特效速度（毫秒）
+            typingSpeed: 200,
             
             // 图片URL
             imageUrl: "https://images.unsplash.com/photo-1558981403-cd07ec5b0abd?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
             
             // 背景音乐URL
-            musicUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+            musicUrl: "",
             
             // 爱心雨设置
             heartCount: 50, // 爱心数量
@@ -224,9 +239,9 @@
             
             // 星星设置
             starCount: 30, // 星星数量
-            starMinSize: 3, // 最小星星大小
-            starMaxSize: 8, // 最大星星大小
-            starTwinkleSpeed: 2 // 闪烁速度
+            starMinSize: 12, // 最小星星大小
+            starMaxSize: 20, // 最大星星大小
+            starLifetime: 3 // 星星存活时间（秒）
         };
         
         // DOM元素
@@ -262,45 +277,93 @@
             
             // 启动按钮点击事件
             startButton.addEventListener('click', startAnimation);
+            
+            // 触屏滑动事件
+            let startX = 0;
+            let startY = 0;
+            let isMoving = false;
+            
+            document.addEventListener('touchstart', function(e) {
+                startX = e.touches[0].clientX;
+                startY = e.touches[0].clientY;
+                isMoving = false;
+            });
+            
+            document.addEventListener('touchmove', function(e) {
+                isMoving = true;
+                const x = ((e.touches[0].clientX / window.innerWidth) * 100);
+                const y = ((e.touches[0].clientY / window.innerHeight) * 100);
+                createStars(x, y);
+            });
+            
+            document.addEventListener('touchend', function() {
+                if (!isMoving) {
+                    const x = ((startX / window.innerWidth) * 100);
+                    const y = ((startY / window.innerHeight) * 100);
+                    createStars(x, y);
+                }
+            });
+            
+            // 鼠标点击事件
+            document.addEventListener('click', function(e) {
+                const x = ((e.clientX / window.innerWidth) * 100);
+                const y = ((e.clientY / window.innerHeight) * 100);
+                createStars(x, y);
+            });
         }
         
         // 开始动画
         function startAnimation() {
-            // 隐藏按钮
             startButton.style.opacity = '0';
             startButton.style.pointerEvents = 'none';
-            
-            // 显示内容容器
             contentContainer.classList.add('visible');
-            
-            // 启动打字机效果
-            typeWriter();
+            textArea.innerHTML = ''; // 清空原有内容
+
+            // 创建多行容器
+            const lines = config.message.map(text => {
+                const div = document.createElement('div');
+                div.className = 'text-area';
+                div.dataset.text = text;
+                return div;
+            });
+
+            // 添加行容器
+            lines.forEach(line => textArea.appendChild(line));
+
+            // 启动多行打字机
+            let currentLine = 0;
+            function typeWriter(line) {
+                line.classList.add('active');
+                const text = line.dataset.text;
+                let charIndex = 0;
+
+                function typeNextCharacter() {
+                    if (charIndex < text.length) {
+                        line.textContent += text[charIndex];
+                        charIndex++;
+                        setTimeout(typeNextCharacter, config.typingSpeed);
+                    } else {
+                        line.classList.remove('active');
+                        line.style.paddingRight = '0';
+                        if (currentLine < lines.length - 1) {
+                            currentLine++;
+                            setTimeout(() => typeWriter(lines[currentLine]), 500);
+                        }
+                    }
+                }
+                typeNextCharacter();
+            }
+
+            // 启动第一行
+            typeWriter(lines[currentLine]);
+
+            // 显示图片
+            setTimeout(() => {
+                giftImage.classList.add('visible');
+            }, 500);
             
             // 启动爱心雨
             createHeartRain();
-        }
-        
-        // 打字机效果
-        function typeWriter() {
-            let i = 0;
-            const text = config.message;
-            const speed = 50; // 打字速度（毫秒）
-            
-            function type() {
-                if (i < text.length) {
-                    textArea.innerHTML += text.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
-                } else {
-                    // 打字完成，显示图片
-                    setTimeout(() => {
-                        giftImage.classList.add('visible');
-                        textArea.classList.add('visible');
-                    }, 500);
-                }
-            }
-            
-            type();
         }
         
         // 创建爱心雨
@@ -327,34 +390,24 @@
         }
         
         // 创建星星
-        function createStars() {
-            for (let i = 0; i < config.starCount; i++) {
-                const star = document.createElement('div');
-                star.className = 'star';
-                star.textContent = '✦';
-                
-                // 随机位置和大小
-                const left = Math.random() * 100;
-                const top = Math.random() * 100;
-                const size = config.starMinSize + Math.random() * (config.starMaxSize - config.starMinSize);
-                const twinkleSpeed = config.starTwinkleSpeed + Math.random() * 2;
-                
-                star.style.left = `${left}%`;
-                star.style.top = `${top}%`;
-                star.style.fontSize = `${size}px`;
-                star.style.animationDuration = `${twinkleSpeed}s`;
-                star.style.animationDelay = `${Math.random() * 5}s`;
-                
-                stars.appendChild(star);
-            }
+        function createStars(x, y) {
+            const star = document.createElement('div');
+            star.className = 'star';
+            star.textContent = '✦';
+            
+            // 设置位置和大小
+            star.style.left = `${x}%`;
+            star.style.top = `${y}%`;
+            const size = config.starMinSize + Math.random() * (config.starMaxSize - config.starMinSize);
+            star.style.fontSize = `${size}px`;
+            
+            // 设置星星存活时间
+            setTimeout(() => {
+                star.style.animationName = 'fade';
+            }, config.starLifetime * 1000);
+            
+            stars.appendChild(star);
         }
-        
-        // 点击屏幕创建星星
-        document.addEventListener('click', function(e) {
-            if (!stars.children.length) {
-                createStars();
-            }
-        });
         
         // 页面加载完成后初始化
         window.addEventListener('load', init);
