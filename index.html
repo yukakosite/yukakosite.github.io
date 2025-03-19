@@ -3,238 +3,361 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>专属心动礼物</title>
+    <title>送给你的特别礼物</title>
     <style>
-        :root {
-            --primary-red: #ff4d4d;
-            --glass-bg: rgba(255, 255, 255, 0.9);
-        }
-
-        body {
-            background: linear-gradient(135deg, #fff5fb 0%, #f8f4ff 100%);
-            min-height: 100vh;
-            overflow-x: hidden;
+        /* 全局样式 */
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: default;
         }
-
-        /* 心形按钮 (60x60px) */
-        #heartContainer {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 1000;
-            cursor: pointer;
-            transition: opacity 0.5s;
-        }
-        .heart-btn {
-            width: 60px;
-            height: 60px;
-            background: var(--primary-red);
-            transform: rotate(45deg);
-            animation: heartbeat 1.2s infinite;
-            position: relative;
-        }
-        .heart-btn::before,
-        .heart-btn::after {
-            content: '';
-            width: 60px;
-            height: 60px;
-            background: var(--primary-red);
-            border-radius: 50%;
-            position: absolute;
-        }
-        .heart-btn::before { top: -30px; }
-        .heart-btn::after { left: -30px; }
-
-        /* 主内容 */
-        #mainContent {
-            display: none;
-            opacity: 0;
-            padding: 20px;
-        }
-
-        /* 磨砂玻璃效果 */
-        .content-box {
-            background: var(--glass-bg);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        }
-
-        /* 自动滚动图片区 */
-        .photo-scroll {
-            width: 100%;
+        
+        body {
+            background-color: #f8f0f0; /* 淡色背景 */
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
             overflow: hidden;
-            margin: 20px 0;
-        }
-        .scroll-track {
             display: flex;
-            animation: scroll 30s linear infinite;
-            width: max-content;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 2s ease;
         }
-        .photo-item {
-            width: 300px;
-            height: 400px;
-            margin-right: 20px;
-            border-radius: 15px;
-            overflow: hidden;
-            transition: transform 0.3s;
-            flex-shrink: 0;
-            background: var(--glass-bg);
+        
+        /* 心形按钮样式 */
+        .heart-button {
+            width: 100px;
+            height: 100px;
+            position: relative;
+            cursor: default;
+            transition: transform 0.3s ease;
         }
-        .photo-item:hover {
-            transform: scale(1.08);
-            cursor: pointer;
+        
+        .heart-button:hover {
+            transform: scale(1.05);
         }
-        .photo-item img {
+        
+        .heart-shape {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            --c: #ff3b3b;
+            border-image: radial-gradient(var(--c) 69%, #0000 70%) 84.5%/50%;
+            clip-path: polygon(-42% 0, 50% 91%, 142% 0);
+            cursor: pointer;
         }
-
-        /* 动画 */
-        @keyframes heartbeat {
-            0%, 100% { transform: rotate(45deg) scale(1); }
-            70% { transform: rotate(45deg) scale(1.1); }
+        
+        /* 内容容器样式 */
+        .content-container {
+            max-width: 800px;
+            width: 90%;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transition: opacity 1s ease, transform 1s ease;
+            transform: translateY(20px);
         }
-        @keyframes scroll {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
+        
+        .content-container.visible {
+            opacity: 1;
+            transform: translateY(0);
         }
-
-        /* 爱心雨 */
+        
+        /* 文字区域样式 */
+        .text-area {
+            margin: 20px 0;
+            min-height: 100px;
+            line-height: 1.6;
+            color: #333;
+            font-size: 1.1rem;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        
+        .text-area.visible {
+            opacity: 1;
+        }
+        
+        /* 图片样式 */
+        .gift-image {
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            display: block;
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+        
+        .gift-image.visible {
+            opacity: 1;
+        }
+        
+        /* 爱心雨样式 */
         .heart-rain {
             position: fixed;
-            color: var(--primary-red);
-            animation: fall 3s linear infinite;
-            opacity: 0.8;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             pointer-events: none;
+            z-index: 1;
         }
-        @keyframes fall {
-            0% { transform: translateY(-100vh) translateX(0); }
-            100% { transform: translateY(100vh) translateX(15vw); }
-        }
-
-        /* 点击星星 */
-        .star {
+        
+        .heart {
             position: absolute;
             width: 20px;
             height: 20px;
-            background: radial-gradient(circle, #fff 20%, rgba(255,168,214,0.6) 60%, transparent 100%);
-            animation: sparkle 1s ease-out;
-            pointer-events: none;
+            --c: #ff3b3b;
+            border-image: radial-gradient(var(--c) 69%, #0000 70%) 84.5%/50%;
+            clip-path: polygon(-42% 0, 50% 91%, 142% 0);
+            animation: fall linear infinite;
         }
-        @keyframes sparkle {
-            0% { transform: scale(0); opacity: 1; }
-            50% { transform: scale(1.5); }
-            100% { transform: scale(0); opacity: 0; }
+        
+        /* 闪烁星星样式 */
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+        
+        .star {
+            position: absolute;
+            color: white;
+            font-size: 10px;
+            animation: twinkle 2s infinite alternate;
+        }
+        
+        /* 动画关键帧 */
+        @keyframes fall {
+            0% {
+                transform: translateY(-100px) rotate(0deg);
+                opacity: 0;
+            }
+            20% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(calc(100vh + 100px)) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes twinkle {
+            0% { opacity: 0.2; }
+            100% { opacity: 1; }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .heart-button {
+                width: 80px;
+                height: 80px;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- 页面图标 -->
+    <link rel="shortcut icon" href="https://img.icons8.com/color/48/000000/gift.png" type="image/x-icon">
+    
     <!-- 心形按钮 -->
-    <div id="heartContainer">
-        <div class="heart-btn"></div>
+    <div class="heart-button" id="startButton">
+        <div class="heart-shape"></div>
     </div>
-
-    <!-- 主内容 -->
-    <div id="mainContent">
-        <div class="content-box">
-            <div class="photo-scroll">
-                <div class="scroll-track">
-                    <div class="photo-item"><img src="image1.jpg"></div>
-                    <div class="photo-item"><img src="image1.jpg"></div>
-                    <div class="photo-item"><img src="image1.jpg"></div>
-                    <div class="photo-item"><img src="image1.jpg"></div>
-                    <div class="photo-item"><img src="image1.jpg"></div>
-                </div>
-            </div>
-            <h1>给特别的你</h1>
-            <p>每个瞬间都值得珍藏...</p>
-        </div>
+    
+    <!-- 内容容器 -->
+    <div class="content-container" id="contentContainer">
+        <!-- 礼物图片 -->
+        <img src="https://images.unsplash.com/photo-1558981403-cd07ec5b0abd?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="礼物图片" class="gift-image" id="giftImage">
+        
+        <!-- 文字区域 -->
+        <div class="text-area" id="textArea"></div>
     </div>
-
-    <!-- 音频 -->
-    <audio id="bgm" loop>
-        <source src="bgm.mp3" type="audio/mpeg">
+    
+    <!-- 爱心雨 -->
+    <div class="heart-rain" id="heartRain"></div>
+    
+    <!-- 闪烁星星 -->
+    <div class="stars" id="stars"></div>
+    
+    <!-- 背景音乐 -->
+    <audio id="backgroundMusic" loop>
+        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
     </audio>
-
+    
     <script>
-        // 初始化状态
-        let isPlaying = false;
-        const heartContainer = document.getElementById('heartContainer');
-        const mainContent = document.getElementById('mainContent');
-        const scrollTrack = document.querySelector('.scroll-track');
-        const audio = document.getElementById('bgm');
-
-        // 心形按钮点击
-        heartContainer.addEventListener('click', () => {
-            heartContainer.style.opacity = '0';
-            heartContainer.style.pointerEvents = 'none';
+        // 可调参数
+        const config = {
+            // 文字内容
+            message: "test",
             
-            mainContent.style.display = 'block';
-            setTimeout(() => {
-                mainContent.style.opacity = '1';
-            }, 100);
-
-            // 启动功能
-            createHearts();
-            audio.play();
-            setupInteractions();
-        });
-
+            // 文字区域样式
+            textColor: "#333", // 文字颜色
+            textSize: "1.1rem", // 文字大小
+            textLineHeight: "1.6", // 文字行高
+            
+            // 图片URL
+            imageUrl: "https://images.unsplash.com/photo-1558981403-cd07ec5b0abd?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+            
+            // 背景音乐URL
+            musicUrl: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+            
+            // 爱心雨设置
+            heartCount: 50, // 爱心数量
+            heartMinSize: 10, // 最小爱心大小
+            heartMaxSize: 30, // 最大爱心大小
+            heartFallSpeed: 2, // 下落速度
+            
+            // 星星设置
+            starCount: 30, // 星星数量
+            starMinSize: 3, // 最小星星大小
+            starMaxSize: 8, // 最大星星大小
+            starTwinkleSpeed: 2 // 闪烁速度
+        };
+        
+        // DOM元素
+        const startButton = document.getElementById('startButton');
+        const contentContainer = document.getElementById('contentContainer');
+        const textArea = document.getElementById('textArea');
+        const giftImage = document.getElementById('giftImage');
+        const heartRain = document.getElementById('heartRain');
+        const stars = document.getElementById('stars');
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        
+        // 初始化
+        function init() {
+            // 设置图片
+            giftImage.src = config.imageUrl;
+            
+            // 设置音乐
+            backgroundMusic.src = config.musicUrl;
+            
+            // 设置文字样式
+            textArea.style.color = config.textColor;
+            textArea.style.fontSize = config.textSize;
+            textArea.style.lineHeight = config.textLineHeight;
+            
+            // 自动播放音乐（注意：某些浏览器需要用户交互后才能播放）
+            document.addEventListener('click', function() {
+                if (backgroundMusic.paused) {
+                    backgroundMusic.play().catch(e => {
+                        console.log('自动播放被阻止，需要用户交互才能播放音乐');
+                    });
+                }
+            }, { once: true });
+            
+            // 启动按钮点击事件
+            startButton.addEventListener('click', startAnimation);
+        }
+        
+        // 开始动画
+        function startAnimation() {
+            // 隐藏按钮
+            startButton.style.opacity = '0';
+            startButton.style.pointerEvents = 'none';
+            
+            // 显示内容容器
+            contentContainer.classList.add('visible');
+            
+            // 启动打字机效果
+            typeWriter();
+            
+            // 启动爱心雨
+            createHeartRain();
+        }
+        
+        // 打字机效果
+        function typeWriter() {
+            let i = 0;
+            const text = config.message;
+            const speed = 50; // 打字速度（毫秒）
+            
+            function type() {
+                if (i < text.length) {
+                    textArea.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                } else {
+                    // 打字完成，显示图片
+                    setTimeout(() => {
+                        giftImage.classList.add('visible');
+                        textArea.classList.add('visible');
+                    }, 500);
+                }
+            }
+            
+            type();
+        }
+        
         // 创建爱心雨
-        function createHearts() {
-            setInterval(() => {
+        function createHeartRain() {
+            for (let i = 0; i < config.heartCount; i++) {
                 const heart = document.createElement('div');
-                heart.className = 'heart-rain';
-                heart.style.left = Math.random() * 100 + 'vw';
-                heart.style.fontSize = Math.random() * 20 + 15 + 'px';
-                heart.innerHTML = Math.random() > 0.5 ? '❤️' : '💖';
-                document.body.appendChild(heart);
-                setTimeout(() => heart.remove(), 3000);
-            }, 300);
+                heart.className = 'heart';
+                
+                // 随机位置和大小
+                const left = Math.random() * 100;
+                const top = Math.random() * -100; // 随机初始位置
+                const size = config.heartMinSize + Math.random() * (config.heartMaxSize - config.heartMinSize);
+                const duration = 5 + Math.random() * 10; // 动画时长
+                
+                heart.style.left = `${left}%`;
+                heart.style.top = `${top}%`;
+                heart.style.width = `${size}px`;
+                heart.style.height = `${size}px`;
+                heart.style.animationDuration = `${duration}s`;
+                heart.style.animationDelay = `${Math.random() * 5}s`;
+                
+                heartRain.appendChild(heart);
+            }
         }
-
-        // 点击星星效果
-        document.addEventListener('click', (e) => {
-            const star = document.createElement('div');
-            star.className = 'star';
-            star.style.left = e.clientX + 'px';
-            star.style.top = e.clientY + 'px';
-            document.body.appendChild(star);
-            setTimeout(() => star.remove(), 1000);
-        });
-
-        // 图片交互
-        function setupInteractions() {
-            // 悬停控制
-            document.querySelectorAll('.photo-item').forEach(item => {
-                item.addEventListener('mouseenter', () => {
-                    scrollTrack.style.animationPlayState = 'paused';
-                });
-                item.addEventListener('mouseleave', () => {
-                    scrollTrack.style.animationPlayState = 'running';
-                });
-            });
-
-            // 点击放大
-            document.querySelectorAll('.photo-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    item.classList.toggle('zoomed');
-                });
-            });
+        
+        // 创建星星
+        function createStars() {
+            for (let i = 0; i < config.starCount; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.textContent = '✦';
+                
+                // 随机位置和大小
+                const left = Math.random() * 100;
+                const top = Math.random() * 100;
+                const size = config.starMinSize + Math.random() * (config.starMaxSize - config.starMinSize);
+                const twinkleSpeed = config.starTwinkleSpeed + Math.random() * 2;
+                
+                star.style.left = `${left}%`;
+                star.style.top = `${top}%`;
+                star.style.fontSize = `${size}px`;
+                star.style.animationDuration = `${twinkleSpeed}s`;
+                star.style.animationDelay = `${Math.random() * 5}s`;
+                
+                stars.appendChild(star);
+            }
         }
-
-        // 重置滚动位置
-        scrollTrack.addEventListener('animationiteration', () => {
-            scrollTrack.style.animation = 'none';
-            void scrollTrack.offsetWidth;
-            scrollTrack.style.animation = 'scroll 30s linear infinite';
+        
+        // 点击屏幕创建星星
+        document.addEventListener('click', function(e) {
+            if (!stars.children.length) {
+                createStars();
+            }
         });
+        
+        // 页面加载完成后初始化
+        window.addEventListener('load', init);
     </script>
 </body>
 </html>
