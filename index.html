@@ -16,12 +16,11 @@
         body {
             background-color: #f8f0f0; /* 淡色背景 */
             font-family: 'Arial', sans-serif;
-            height: 100vh;
+            min-height: 100vh;
             overflow: auto; /* 修复滑动功能 */
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             transition: background-color 2s ease;
         }
         
@@ -59,7 +58,8 @@
             padding: 30px;
             opacity: 0;
             transition: opacity 1s ease;
-            margin-top: 150px; /* 固定与图片区域的距离 */
+            position: relative;
+            margin-top: 400px; /* 固定与图片区域的距离 */
         }
         
         .content-container.visible {
@@ -99,7 +99,7 @@
         
         /* 图片样式 */
         .gift-image {
-            width: 100%;
+            width: 70%; /* 图片宽度占据整个屏幕 */
             max-width: 500px;
             height: auto;
             border-radius: 10px;
@@ -183,7 +183,7 @@
             }
             
             .content-container {
-                margin-top: 100px; /* 移动设备上的调整 */
+                margin-top: 400px; /* 移动设备上的调整 */
             }
             
             .text-area {
@@ -209,8 +209,8 @@
 </head>
 <body>
     <!-- 页面图标 -->
-    <link type="image/png" sizes="16x16" rel="icon" href=".../icons8-heart-color-16.png">
-    <link type="image/png" sizes="32x32" rel="icon" href=".../icons8-heart-color-32.png">
+    <link rel="shortcut icon" href="icron8.png" type="image/x-icon">
+    
     <!-- 心形按钮 -->
     <div class="heart-button" id="startButton">
         <div class="heart-shape"></div>
@@ -233,7 +233,7 @@
     
     <!-- 背景音乐 -->
     <audio id="backgroundMusic" loop>
-        <source src="https://dlink.host/sharepoint/aHR0cHM6Ly9vbmVkcnYtbXkuc2hhcmVwb2ludC5jb20vOnU6L2cvcGVyc29uYWwvc3Rvcl9vbmVkcnZfb25taWNyb3NvZnRfY29tL0VabnZ0azhrRTI5TW5OdVR6WjRqWDB3Qm5jbnZTRHhYODAxM3RkbDBTZEszb1E.mp3" type="audio/mp3">
+        <source src="music.mp3" type="audio/mp3">
     </audio>
     
     <script>
