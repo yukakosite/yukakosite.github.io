@@ -29,13 +29,17 @@
         .heart-button {
             width: 100px;
             height: 100px;
-            position: relative;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             cursor: default;
             transition: transform 0.3s ease;
+            z-index: 10;
         }
         
         .heart-button:hover {
-            transform: scale(1.05);
+            transform: translate(-50%, -50%) scale(1.05);
         }
         
         .heart-shape {
@@ -55,28 +59,24 @@
             padding: 30px;
             opacity: 0;
             transition: opacity 1s ease;
-            margin-top: 20px;
+            margin-top: 150px; /* 固定与图片区域的距离 */
         }
         
         .content-container.visible {
             opacity: 1;
         }
         
-    /* 修改文字区域样式 */
+        /* 文字区域样式 */
         .text-area {
-            margin: 20px auto;
+            margin: 20px 0;
             line-height: 1.6;
             color: #333;
             font-size: 1.1rem;
-            white-space: nowrap;
-            overflow: visible;
+            white-space: pre-wrap; /* 允许换行 */
             position: relative;
-            display: block;
-            width: fit-content;
-            padding-right: 25px;
-            height: 40px;
+            padding-right: 25px; /* 为光标预留空间 */
         }
-
+        
         .text-area::after {
             content: "|";
             position: absolute;
@@ -86,10 +86,15 @@
             opacity: 0;
             transition: opacity 0.1s;
         }
-
+        
         .text-area.active::after {
             opacity: 1;
             animation: blink 0.8s step-end infinite;
+        }
+        
+        @keyframes blink {
+            from, to { opacity: 0; }
+            50% { opacity: 1; }
         }
         
         /* 图片样式 */
@@ -147,7 +152,7 @@
             position: absolute;
             color: white;
             font-size: 10px;
-            animation: fade 3s forwards;
+            animation: fade forwards;
         }
         
         @keyframes fade {
@@ -176,12 +181,16 @@
                 width: 80px;
                 height: 80px;
             }
+            
+            .content-container {
+                margin-top: 100px; /* 移动设备上的调整 */
+            }
         }
     </style>
 </head>
 <body>
     <!-- 页面图标 -->
-    <link rel="shortcut icon" href="https://img.icons8.com/color/48/000000/gift.png" type="image/x-icon">
+    <link rel="shortcut icon " type="images/x-icon" href="./icon8.png">
     
     <!-- 心形按钮 -->
     <div class="heart-button" id="startButton">
@@ -189,7 +198,7 @@
     </div>
     
     <!-- 礼物图片 -->
-    <img src="https://images.unsplash.com/photo-1558981403-cd07ec5b0abd?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80" alt="礼物图片" class="gift-image" id="giftImage">
+    <img src="https://p.sda1.dev/22/fb6f06d669119ff79f19e9c1fe124d86/image1.jpg" alt="礼物图片" class="gift-image" id="giftImage">
     
     <!-- 内容容器 -->
     <div class="content-container" id="contentContainer">
@@ -205,31 +214,28 @@
     
     <!-- 背景音乐 -->
     <audio id="backgroundMusic" loop>
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
+        <source src="./music.mp3" type="audio/mp3">
     </audio>
     
     <script>
         // 可调参数
         const config = {
             // 文字内容
-            message: [
-                "ttttttttttttttttttttttttttttttttttttttttttt！",
-                "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-                "ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss！"
-            ],
+            message: "春风轻拂花瓣\n飘落在你的肩头\n湖面泛起涟漪\n映照着你的眼眸\n我们的故事\n在时光里缓缓流淌\n每一个微笑\n每一次拥抱\n都是爱的印记\n\n月光洒在窗前\n你依偎在我身旁\n星空下许愿\n我们的爱永恒不变\n岁月如诗如画\n我们携手走过\n直到世界尽头\n爱永不褪色",
+            
             // 文字区域样式
             textColor: "#333", // 文字颜色
             textSize: "1.1rem", // 文字大小
-            textLineHeight: "1.2", // 文字行高
+            textLineHeight: "1.6", // 文字行高
             
             // 打字机特效速度（毫秒）
-            typingSpeed: 200,
+            typingSpeed: 100,
             
             // 图片URL
-            imageUrl: "https://images.unsplash.com/photo-1558981403-cd07ec5b0abd?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+            imageUrl: "https://p.sda1.dev/22/fb6f06d669119ff79f19e9c1fe124d86/image1.jpg",
             
             // 背景音乐URL
-            musicUrl: "",
+            musicUrl: "https://dlink.host/sharepoint/aHR0cHM6Ly9vbmVkcnYtbXkuc2hhcmVwb2ludC5jb20vOnU6L2cvcGVyc29uYWwvc3Rvcl9vbmVkcnZfb25taWNyb3NvZnRfY29tL0VabnZ0azhrRTI5TW5OdVR6WjRqWDB3Qm5jbnZTRHhYODAxM3RkbDBTZEszb1E.mp3",
             
             // 爱心雨设置
             heartCount: 50, // 爱心数量
@@ -240,8 +246,8 @@
             // 星星设置
             starCount: 30, // 星星数量
             starMinSize: 12, // 最小星星大小
-            starMaxSize: 20, // 最大星星大小
-            starLifetime: 3 // 星星存活时间（秒）
+            starMaxSize: 18, // 最大星星大小
+            starLifetime: 10 // 星星存活时间（秒）
         };
         
         // DOM元素
@@ -277,6 +283,9 @@
             
             // 启动按钮点击事件
             startButton.addEventListener('click', startAnimation);
+            
+            // 添加触屏事件监听
+            startButton.addEventListener('touchend', startAnimation);
             
             // 触屏滑动事件
             let startX = 0;
@@ -314,49 +323,27 @@
         
         // 开始动画
         function startAnimation() {
+            // 隐藏按钮
             startButton.style.opacity = '0';
             startButton.style.pointerEvents = 'none';
+            
+            // 显示内容容器
             contentContainer.classList.add('visible');
-            textArea.innerHTML = ''; // 清空原有内容
-
-            // 创建多行容器
-            const lines = config.message.map(text => {
-                const div = document.createElement('div');
-                div.className = 'text-area';
-                div.dataset.text = text;
-                return div;
-            });
-
-            // 添加行容器
-            lines.forEach(line => textArea.appendChild(line));
-
-            // 启动多行打字机
-            let currentLine = 0;
-            function typeWriter(line) {
-                line.classList.add('active');
-                const text = line.dataset.text;
-                let charIndex = 0;
-
-                function typeNextCharacter() {
-                    if (charIndex < text.length) {
-                        line.textContent += text[charIndex];
-                        charIndex++;
-                        setTimeout(typeNextCharacter, config.typingSpeed);
-                    } else {
-                        line.classList.remove('active');
-                        line.style.paddingRight = '0';
-                        if (currentLine < lines.length - 1) {
-                            currentLine++;
-                            setTimeout(() => typeWriter(lines[currentLine]), 500);
-                        }
-                    }
+            
+            // 设置文字内容
+            textArea.textContent = "";
+            
+            // 启动打字机特效
+            let index = 0;
+            function typeWriter() {
+                if (index < config.message.length) {
+                    textArea.textContent += config.message.charAt(index);
+                    index++;
+                    setTimeout(typeWriter, config.typingSpeed);
                 }
-                typeNextCharacter();
             }
-
-            // 启动第一行
-            typeWriter(lines[currentLine]);
-
+            typeWriter();
+            
             // 显示图片
             setTimeout(() => {
                 giftImage.classList.add('visible');
@@ -402,9 +389,7 @@
             star.style.fontSize = `${size}px`;
             
             // 设置星星存活时间
-            setTimeout(() => {
-                star.style.animationName = 'fade';
-            }, config.starLifetime * 1000);
+            star.style.animation = `fade ${config.starLifetime}s forwards`;
             
             stars.appendChild(star);
         }
