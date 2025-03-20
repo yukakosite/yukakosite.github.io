@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WOOOOOHOOOO</title>
+    <title>送给你的特别礼物</title>
     <style>
         /* 全局样式 */
         * {
@@ -17,7 +17,7 @@
             background-color: #f8f0f0; /* 淡色背景 */
             font-family: 'Arial', sans-serif;
             height: 100vh;
-            overflow: hidden;
+            overflow: auto; /* 修复滑动功能 */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -185,6 +185,25 @@
             .content-container {
                 margin-top: 100px; /* 移动设备上的调整 */
             }
+            
+            .text-area {
+                font-size: 1rem; /* 调整文字大小 */
+            }
+        }
+        
+        /* 使用rem单位进行适配 */
+        html {
+            font-size: 16px; /* 基准字体大小 */
+        }
+        
+        @media (max-width: 768px) {
+            html {
+                font-size: 14px; /* 调整基准字体大小 */
+            }
+        }
+        
+        .gift-image {
+            font-size: 0; /* 解决图片间隙问题 */
         }
     </style>
 </head>
@@ -214,7 +233,7 @@
     
     <!-- 背景音乐 -->
     <audio id="backgroundMusic" loop>
-        <source src="music.mp3" type="audio/mp3" autoplay="autoplay" loop="loop">
+        <source src="https://dlink.host/sharepoint/aHR0cHM6Ly9vbmVkcnYtbXkuc2hhcmVwb2ludC5jb20vOnU6L2cvcGVyc29uYWwvc3Rvcl9vbmVkcnZfb25taWNyb3NvZnRfY29tL0VabnZ0azhrRTI5TW5OdVR6WjRqWDB3Qm5jbnZTRHhYODAxM3RkbDBTZEszb1E.mp3" type="audio/mp3">
     </audio>
     
     <script>
